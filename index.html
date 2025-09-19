@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Guia Interativo de Seul</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+    <!-- Chosen Palette: Warm Neutrals -->
+    <!-- Application Structure Plan: A single-page application with a fixed top navigation bar to switch between thematic sections (Culture, Food, Sights, etc.). Content for each section is displayed in a grid of interactive cards. Clicking a card opens a modal with detailed information. This structure was chosen because the source document is a collection of lists; a tabbed, card-based interface breaks the information into manageable, thematic chunks, providing a modern, app-like user experience that is far more navigable and engaging than a long, scrolling document. -->
+    <!-- Visualization & Content Choices: The report is entirely qualitative, consisting of lists and descriptions. Therefore, no data charts are used. The primary goal is information organization and exploration. The chosen method is interactive cards and modals. Report Info -> Thematic Lists (e.g., Food, Sights); Goal -> Organize & Inform; Presentation Method -> Grid of Cards; Interaction -> Clicking a card opens a modal with details; Justification -> This keeps the main interface clean while providing deep-dive information on demand, which is ideal for a travel guide where users want to browse options and then get specifics. Library/Method -> Vanilla JS for DOM manipulation (navigation and modals) and TailwindCSS for styling. -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #FDFBF8;
+            color: #4A4A4A;
+        }
+        .nav-link {
+            transition: all 0.3s ease;
+            border-bottom: 2px solid transparent;
+        }
+        .nav-link.active, .nav-link:hover {
+            border-bottom-color: #D97706; /* amber-600 */
+            color: #D97706;
+        }
+        .content-section {
+            display: none;
+        }
+        .content-section.active {
+            display: block;
+        }
+        .card {
+            background-color: #FFFFFF;
+            border: 1px solid #F3F4F6; /* gray-100 */
+            border-radius: 0.75rem;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            cursor: pointer;
+        }
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+        .modal {
+            display: none;
+            animation: fadeIn 0.3s ease-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        .modal-content {
+            animation: slideUp 0.3s ease-out;
+        }
+        @keyframes slideUp {
+            from { transform: translateY(20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        .accordion-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.5s ease-in-out;
+        }
+    </style>
+</head>
+<body>
+    <div id="app" class="antialiased">
+        <header class="bg-white/80 backdrop-blur-md shadow-sm sticky top-0 z-40">
+            <div class="container mx-auto px-4 py-4">
+                <h1 class="text-3xl font-bold text-gray-800 text-center">Guia Interativo de Seul</h1>
+                <p class="text-center text-gray-500 mt-1">Sua viagem para a Coreia do Sul em Outubro</p>
+            </div>
+            <nav class="border-b border-gray-200">
+                <div class="container mx-auto px-4">
+                    <ul class="flex justify-center flex-wrap space-x-4 sm:space-x-8 text-sm sm:text-base font-medium text-gray-600">
+                        <li><a href="#cultura" class="nav-link active py-3 block">🎭 Cultura</a></li>
+                        <li><a href="#gastronomia" class="nav-link py-3 block">🍜 Gastronomia</a></li>
+                        <li><a href="#locais" class="nav-link py-3 block">🏛️ Locais</a></li>
+                        <li><a href="#compras" class="nav-link py-3 block">🛍️ Compras</a></li>
+                        <li><a href="#fotos" class="nav-link py-3 block">📸 Fotos</a></li>
+                        <li><a href="#arredores" class="nav-link py-3 block">🚆 Arredores</a></li>
+                        <li><a href="#dicas" class="nav-link py-3 block">🧭 Dicas</a></li>
+                    </ul>
+                </div>
+            </nav>
+        </header>
+
+        <main class="container mx-auto p-4 md:p-8">
+            
+            <section id="cultura" class="content-section active">
+                <div class="text-center mb-8">
+                    <h2 class="text-2xl font-bold text-gray-800">Eventos Culturais</h2>
+                    <p class="text-gray-600 mt-2">Mergulhe na vibrante cena cultural de Seul. Lembre-se de confirmar as datas, pois podem variar anualmente.</p>
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+            </section>
+
+            <section id="gastronomia" class="content-section">
+                <div class="text-center mb-8">
+                    <h2 class="text-2xl font-bold text-gray-800">Sabores da Coreia</h2>
+                    <p class="text-gray-600 mt-2">Uma seleção de pratos imperdíveis para experimentar a autêntica culinária coreana.</p>
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+            </section>
+
+            <section id="locais" class="content-section">
+                <div class="text-center mb-8">
+                    <h2 class="text-2xl font-bold text-gray-800">Pontos Turísticos em Seul</h2>
+                    <p class="text-gray-600 mt-2">Explore a rica história e a modernidade pulsante da capital sul-coreana.</p>
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+            </section>
+
+            <section id="compras" class="content-section">
+                <div class="text-center mb-8">
+                    <h2 class="text-2xl font-bold text-gray-800">Paraíso das Compras</h2>
+                    <p class="text-gray-600 mt-2">De cosméticos a mercados tradicionais, encontre os melhores lugares para suas compras.</p>
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+            </section>
+
+            <section id="fotos" class="content-section">
+                <div class="text-center mb-8">
+                    <h2 class="text-2xl font-bold text-gray-800">Spots Fotogênicos</h2>
+                    <p class="text-gray-600 mt-2">Capture a beleza de Seul nos locais mais incríveis para fotos.</p>
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+            </section>
+            
+            <section id="arredores" class="content-section">
+                <div class="text-center mb-8">
+                    <h2 class="text-2xl font-bold text-gray-800">Passeios nos Arredores</h2>
+                    <p class="text-gray-600 mt-2">Descubra as joias escondidas a uma curta viagem de Seul.</p>
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+            </section>
+            
+            <section id="dicas" class="content-section">
+                <div class="text-center mb-8">
+                    <h2 class="text-2xl font-bold text-gray-800">Dicas Logísticas</h2>
+                    <p class="text-gray-600 mt-2">Informações essenciais para uma viagem tranquila e bem-sucedida em outubro.</p>
+                </div>
+                <div class="max-w-3xl mx-auto space-y-4"></div>
+            </section>
+
+        </main>
+    </div>
+
+    <div id="modal" class="modal fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center p-4 z-50">
+        <div class="modal-content bg-white rounded-lg shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+            <div class="p-6">
+                <div class="flex justify-between items-start">
+                    <h3 id="modal-title" class="text-2xl font-bold text-gray-800"></h3>
+                    <button id="modal-close" class="text-gray-400 hover:text-gray-700 text-2xl">&times;</button>
+                </div>
+                <div id="modal-body" class="mt-4 text-gray-600 space-y-4"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const data = {
+            cultura: [
+                { title: 'Seoul Street Arts Festival', content: 'Performances de rua, circo, dança e música na Seoul Plaza. É um dos maiores festivais de arte de rua da Ásia.' },
+                { title: 'Seoul International Fireworks Festival', content: 'Espetáculo de fogos de artifício no Yeouido Hangang Park, com equipes de vários países. Um evento visualmente deslumbrante.' },
+                { title: 'Seoul Fashion Week', content: 'Principal evento de moda da Coreia, realizado no Dongdaemun Design Plaza (DDP). Ótima oportunidade para ver as últimas tendências e o street style local.' },
+                { title: 'National Gugak Center', content: 'Assista a performances de música e dança tradicionais coreanas (Gugak). Programação variada, incluindo apresentações de Pansori.' },
+                { title: 'Jeongdong Theater', content: 'Famoso por espetáculos que misturam tradição e modernidade. As produções são visualmente ricas e acessíveis a estrangeiros.' },
+                { title: 'Cookin’ NANTA', content: 'Show de comédia não-verbal que usa utensílios de cozinha como instrumentos musicais. Energético, divertido e universalmente compreendido.' },
+                { title: 'JUMP Show', content: 'Espetáculo de comédia que mistura artes marciais, acrobacias e humor. Outra ótima opção não-verbal.' },
+                { title: 'Seoul Lantern Festival', content: 'Lanternas iluminam o riacho Cheonggyecheon, criando uma atmosfera mágica à noite. O tema varia a cada ano.' },
+                { title: 'Palace Culture Week (Gyeongbokgung)', content: 'Eventos especiais, cerimônias e performances nos palácios reais, geralmente na primavera e no outono.' },
+                { title: 'Jongmyo Jeryeak', content: 'Música ritual da realeza da Dinastia Joseon, Patrimônio da UNESCO. Apresentações regulares no Santuário de Jongmyo.' },
+                { title: 'National Museum of Korea', content: 'Explore a vasta coleção de arte e artefatos coreanos. Exposições especiais são frequentes.' },
+                { title: 'Seoul Arts Center', content: 'Complexo cultural com óperas, balés, musicais e exposições de arte. Verifique a programação de outubro.' },
+                { title: 'MMCA (National Museum of Modern and Contemporary Art)', content: 'Principal museu de arte moderna e contemporânea da Coreia, com filiais em vários locais.' },
+                { title: 'Bukchon Hanok Village', content: 'Participe de workshops de artesanato tradicional (nós coreanos, papel Hanji) em casas históricas.' },
+                { title: 'Namsangol Hanok Village', content: 'Além de casas tradicionais, oferece performances regulares de Taekwondo e outras artes.' },
+            ],
+            gastronomia: [
+                { title: 'Bibimbap', content: 'Arroz misturado com vegetais, carne e ovo. Onde provar: Gogung (Myeongdong) para uma versão tradicional.' },
+                { title: 'Korean BBQ (Gogi-gui)', content: 'Carne grelhada na mesa. Onde provar: Wangbijib (Myeongdong) ou explore as ruas de Mapo-gu.' },
+                { title: 'Kimchi Jjigae', content: 'Ensopado picante de kimchi. Onde provar: Gwanghwamun Jip (Seodaemun-gu) para uma experiência autêntica.' },
+                { title: 'Tteokbokki', content: 'Bolo de arroz em molho picante. Onde provar: Mercados de rua em Myeongdong ou Gwangjang Market.' },
+                { title: 'Samgyetang', content: 'Sopa de galinha com ginseng. Onde provar: Tosokchon Samgyetang (perto do Palácio Gyeongbokgung).' },
+                { title: 'Chimaek (Frango e Cerveja)', content: 'Frango frito coreano com cerveja. Onde provar: BHC Chicken ou Kyochon Chicken (franquias populares).' },
+                { title: 'Japchae', content: 'Macarrão de batata-doce com vegetais e carne. Onde provar: Comum em restaurantes tradicionais e mercados.' },
+                { title: 'Gimbap', content: 'Rolos de arroz e algas. Onde provar: Mercados como Gwangjang ou lojas de conveniência para uma refeição rápida.' },
+                { title: 'Haemul Pajeon', content: 'Panqueca de frutos do mar e cebolinha. Onde provar: Mercados e restaurantes especializados em comida tradicional.' },
+                { title: 'Bulgogi', content: 'Carne marinada e grelhada. Onde provar: Byeokje Galbi (restaurante de alta qualidade) ou restaurantes de BBQ.' },
+                { title: 'Mandu', content: 'Pastéis coreanos (cozidos no vapor ou fritos). Onde provar: Myeongdong Kyoja (famoso pelo seu mandu).' },
+                { title: 'Naengmyeon', content: 'Macarrão frio (ótimo para limpar o paladar). Onde provar: Ojang-dong Heungnamjip.' },
+                { title: 'Hotteok', content: 'Panqueca doce recheada (comum no inverno/outono). Onde provar: Vendedores de rua em Insadong ou Namdaemun.' },
+                { title: 'Bingsu', content: 'Sobremesa de gelo raspado. Onde provar: Sulbing (franquia popular com muitas variações).' },
+                { title: 'Makgeolli (Vinho de Arroz)', content: 'Bebida alcoólica tradicional. Onde provar: Bares tradicionais (Jumak) em Insadong.' },
+            ],
+            locais: [
+                { title: 'Gyeongbokgung Palace', content: 'O principal e maior palácio real. Assista à troca da guarda e alugue um hanbok para fotos.' },
+                { title: 'Changdeokgung Palace & Secret Garden', content: 'Palácio Patrimônio da UNESCO, famoso por seu jardim secreto (Huwon).' },
+                { title: 'Bukchon Hanok Village', content: 'Vila residencial com casas tradicionais (hanok). Respeite o silêncio.' },
+                { title: 'Insadong', content: 'Rua com lojas de artesanato, galerias de arte e casas de chá tradicionais.' },
+                { title: 'Jogyesa Temple', content: 'Templo principal do budismo zen coreano, localizado no centro da cidade.' },
+                { title: 'Myeongdong', content: 'Centro de compras, cosméticos, comida de rua e entretenimento.' },
+                { title: 'N Seoul Tower', content: 'Torre icônica no Monte Namsan com vistas panorâmicas de 360 graus da cidade.' },
+                { title: 'Gangnam', content: 'Bairro moderno, conhecido pelo K-Pop, COEX Starfield Library e lojas de grife.' },
+                { title: 'Hongdae', content: 'Bairro universitário com cena artística, música ao vivo, cafés e vida noturna.' },
+                { title: 'Dongdaemun Design Plaza (DDP)', content: 'Marco arquitetônico de Zaha Hadid, com exposições, lojas e eventos.' },
+                { title: 'Gwangjang Market', content: 'Um dos mercados mais antigos, famoso por sua autêntica comida de rua.' },
+                { title: 'Cheonggyecheon Stream', content: 'Riacho revitalizado que corta o centro da cidade, ótimo para uma caminhada relaxante.' },
+                { title: 'War Memorial of Korea', content: 'Museu abrangente sobre a história militar da Coreia. Gratuito e muito informativo.' },
+                { title: 'Leeum, Samsung Museum of Art', content: 'Museu com uma incrível coleção de arte tradicional e contemporânea coreana.' },
+                { title: 'Itaewon', content: 'Bairro multicultural com restaurantes internacionais, bares e uma atmosfera cosmopolita.' },
+            ],
+            compras: [
+                { title: 'Myeongdong (Cosméticos)', content: 'O epicentro das lojas de K-beauty. Todas as grandes marcas têm lojas-conceito aqui.' },
+                { title: 'Garosu-gil (Boutiques)', content: 'Rua charmosa em Gangnam com boutiques de designers locais, cafés e galerias.' },
+                { title: 'Hongdae (Moda Jovem)', content: 'Roupas, acessórios e calçados da moda universitária a preços acessíveis.' },
+                { title: 'Dongdaemun Market (Atacado e Varejo)', content: 'Complexo de shoppings que funcionam até de madrugada. Ótimo para compras em volume.' },
+                { title: 'Namdaemun Market (Tradicional)', content: 'O maior mercado tradicional da Coreia, onde se vende de tudo: roupas, utensílios, comida, etc.' },
+                { title: 'COEX Starfield Mall (Luxo e Entretenimento)', content: 'Shopping subterrâneo gigante com a famosa Starfield Library.' },
+                { title: 'Hyundai Department Store (Grifes)', content: 'Loja de departamento de luxo com marcas internacionais e coreanas de alta qualidade.' },
+                { title: 'Insadong (Artesanato e Souvenirs)', content: 'Ideal para comprar presentes tradicionais, cerâmica, papel Hanji e pincéis de caligrafia.' },
+                { title: 'Ewha Womans University Shopping Street', content: 'Roupas e acessórios femininos a preços muito competitivos, voltado para o público universitário.' },
+                { title: 'Goto Mall (Express Bus Terminal)', content: 'Shopping subterrâneo com uma vasta seleção de roupas femininas a preços baixos.' },
+                { title: 'Lotte Mart / E-mart (Supermercados)', content: 'Compre snacks coreanos, kimchi, algas e outros produtos alimentícios para levar para casa.' },
+                { title: 'Apgujeong Rodeo Street (Marcas de Luxo)', content: 'A área mais sofisticada para compras de grife em Seul.' },
+                { title: 'Samcheong-dong', content: 'Lojas de designers independentes e galerias de arte em um ambiente pitoresco.' },
+                { title: 'KT&G Sangsangmadang (Design)', content: 'Loja em Hongdae com produtos de design, arte e artigos de papelaria de artistas locais.' },
+                { title: 'Common Ground', content: 'Shopping center construído com contêineres, focado em marcas de moda street e designers emergentes.' },
+            ],
+            fotos: [
+                { title: 'Gyeongbokgung com Hanbok', content: 'Alugar um traje tradicional e fotografar nos pátios do palácio.' },
+                { title: 'Bukchon Hanok Village (Beco)', content: 'A famosa viela com vista para a N Seoul Tower ao fundo.' },
+                { title: 'Starfield Library (COEX)', content: 'As estantes de livros gigantescas são um cenário impressionante.' },
+                { title: 'Dongdaemun Design Plaza (DDP) à Noite', content: 'A arquitetura futurista iluminada e o campo de rosas de LED.' },
+                { title: 'Ihwa Mural Village', content: 'Arte de rua, murais coloridos e instalações artísticas em um bairro charmoso.' },
+                { title: 'N Seoul Tower ao Pôr do Sol', content: 'A vista da cidade se transformando do dia para a noite.' },
+                { title: 'Cheonggyecheon Stream à Noite', content: 'As luzes da cidade refletidas na água criam uma atmosfera romântica.' },
+                { title: 'Changdeokgung Secret Garden no Outono', content: 'As cores vibrantes das folhas de outono no jardim real.' },
+                { title: 'Seoul City Wall (Trilhas)', content: 'Vistas panorâmicas da cidade a partir das antigas muralhas.' },
+                { title: 'Gwanghwamun Square', content: 'As estátuas do Rei Sejong e do Almirante Yi Sun-sin com as montanhas ao fundo.' },
+                { title: 'Common Ground', content: 'A estrutura azul dos contêineres é um fundo industrial-chique popular.' },
+                { title: 'Seoul Forest', content: 'Parque com diversas paisagens, incluindo um bosque de bétulas e jardins floridos.' },
+                { title: 'Deoksugung Palace (Pedras)', content: 'A passarela de parede de pedra ao lado do palácio é um local de filmagem famoso.' },
+                { title: 'Sewoon Sangga / Cheonggyecheon', content: 'Uma perspectiva única que mistura a arquitetura retrô do mercado com o riacho moderno.' },
+                { title: 'Ewha Womans University Campus', content: 'A impressionante arquitetura do vale do campus projetado por Dominique Perrault.' },
+            ],
+            arredores: [
+                { title: 'DMZ (Zona Desmilitarizada)', content: 'Excursão de um dia para a fronteira com a Coreia do Norte. Requer reserva antecipada.' },
+                { title: 'Suwon Hwaseong Fortress', content: 'Fortaleza do século 18, Patrimônio da UNESCO, ótima para caminhadas.' },
+                { title: 'Yongin Korean Folk Village', content: 'Performances folclóricas e ambientes históricos que recriam a era Joseon.' },
+                { title: 'Everland (Yongin)', content: 'Um dos maiores parques temáticos da Coreia, com um belo jardim no outono.' },
+                { title: 'Namhansanseong Fortress (Gwangju)', content: 'Fortaleza na montanha com trilhas, vistas panorâmicas e muita história.' },
+                { title: 'Nami Island (Gapyeong)', content: 'Famosa por suas alamedas de árvores, espetacular durante o outono.' },
+                { title: 'Garden of Morning Calm (Gapyeong)', content: 'Jardim botânico deslumbrante, especialmente com as cores de outono.' },
+                { title: 'Petite France & Italian Village (Gapyeong)', content: 'Vilas temáticas fotogênicas com arquitetura de estilo europeu.' },
+                { title: 'Pocheon Art Valley', content: 'Antiga pedreira transformada em um parque com um lago de água turquesa e um museu de arte.' },
+                { title: 'Gwangmyeong Cave', content: 'Mina revitalizada que agora abriga exposições de arte e uma adega de vinhos.' },
+                { title: 'Dumulmeori (Yangpyeong)', content: 'Local onde dois rios se encontram, com pontes de madeira e um cenário perfeito para fotos ao amanhecer.' },
+                { title: 'Ganghwado Island (Incheon)', content: 'Ilha com dólmens da UNESCO, templos antigos e fortalezas históricas.' },
+                { title: 'Incheon Chinatown & Songwol-dong Fairy Tale Village', content: 'Rua histórica com a maior comunidade chinesa da Coreia, ao lado de uma vila com murais de contos de fadas.' },
+                { title: 'Songdo Central Park (Incheon)', content: 'Parque moderno com um skyline impressionante, um canal e passeios de barco.' },
+            ],
+            dicas: [
+                {
+                    title: 'Clima em Outubro',
+                    content: 'O outono é ameno, com temperaturas variando entre 12°C e 20°C. Recomenda-se levar um casaco leve, roupas de segunda pele (térmicas) para as noites mais frias, e um corta-vento ou guarda-chuva para dias de chuva ocasional. É uma das melhores épocas para visitar, com céu claro e pouca umidade.'
+                },
+                {
+                    title: 'Transporte Público',
+                    content: 'Adquira um cartão T-Money em qualquer loja de conveniência. Ele é recarregável e pode ser usado no metrô, ônibus e táxis, tornando os deslocamentos muito mais fáceis. Para navegação, baixe os aplicativos Naver Map ou KakaoMap, pois o Google Maps tem funcionalidades limitadas na Coreia do Sul.'
+                },
+                {
+                    title: 'Conectividade e Wi-Fi',
+                    content: 'Compre um eSIM (se seu celular for compatível) ou um SIM card local no Aeroporto de Incheon para ter dados móveis ilimitados. Embora o Wi-Fi público seja amplamente disponível em cafés, shoppings e no metrô, ter um plano de dados garante conexão constante, especialmente para usar mapas e tradutores.'
+                },
+                {
+                    title: 'Pagamentos e Dinheiro',
+                    content: 'Cartões de crédito internacionais são amplamente aceitos em lojas, restaurantes e hotéis. No entanto, é sempre bom ter um pouco de dinheiro em espécie (Won sul-coreano, KRW) para compras em mercados de rua, pequenas lojas ou para recarregar seu T-Money.'
+                }
+            ]
+        };
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const navLinks = document.querySelectorAll('.nav-link');
+            const contentSections = document.querySelectorAll('.content-section');
+            const modal = document.getElementById('modal');
+            const modalTitle = document.getElementById('modal-title');
+            const modalBody = document.getElementById('modal-body');
+            const modalClose = document.getElementById('modal-close');
+
+            const createCard = (item) => {
+                const card = document.createElement('div');
+                card.className = 'card p-6';
+                card.innerHTML = `<h3 class="text-xl font-bold text-gray-800">${item.title}</h3>`;
+                card.addEventListener('click', () => {
+                    modalTitle.textContent = item.title;
+                    modalBody.innerHTML = `<p>${item.content.replace(/\n/g, '<br>')}</p>`;
+                    modal.style.display = 'flex';
+                });
+                return card;
+            };
+            
+            const createAccordionItem = (item) => {
+                const wrapper = document.createElement('div');
+                wrapper.className = 'bg-white border border-gray-200 rounded-lg';
+                
+                const header = document.createElement('button');
+                header.className = 'w-full flex justify-between items-center p-5 text-left font-semibold text-gray-800 hover:bg-gray-50';
+                header.innerHTML = `
+                    <span>${item.title}</span>
+                    <svg class="w-5 h-5 transform transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                `;
+                
+                const contentDiv = document.createElement('div');
+                contentDiv.className = 'accordion-content';
+                contentDiv.innerHTML = `<div class="p-5 border-t border-gray-200 text-gray-600">${item.content}</div>`;
+                
+                wrapper.appendChild(header);
+                wrapper.appendChild(contentDiv);
+                
+                header.addEventListener('click', () => {
+                    const icon = header.querySelector('svg');
+                    const isExpanded = contentDiv.style.maxHeight && contentDiv.style.maxHeight !== '0px';
+                    if (isExpanded) {
+                        contentDiv.style.maxHeight = '0px';
+                        icon.classList.remove('rotate-180');
+                    } else {
+                        contentDiv.style.maxHeight = contentDiv.scrollHeight + 'px';
+                        icon.classList.add('rotate-180');
+                    }
+                });
+                
+                return wrapper;
+            };
+
+            Object.keys(data).forEach(key => {
+                const section = document.getElementById(key);
+                const container = section.querySelector('.grid, .space-y-4');
+                if (!container) return;
+
+                if (key === 'dicas') {
+                    data[key].forEach(item => container.appendChild(createAccordionItem(item)));
+                } else {
+                    data[key].forEach(item => container.appendChild(createCard(item)));
+                }
+            });
+
+            const switchTab = (hash) => {
+                navLinks.forEach(link => {
+                    link.classList.toggle('active', link.hash === hash);
+                });
+                contentSections.forEach(section => {
+                    section.classList.toggle('active', `#${section.id}` === hash);
+                });
+                window.scrollTo(0, 0);
+            };
+
+            navLinks.forEach(link => {
+                link.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    switchTab(link.hash);
+                });
+            });
+            
+            modalClose.addEventListener('click', () => modal.style.display = 'none');
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) {
+                    modal.style.display = 'none';
+                }
+            });
+            
+            switchTab(window.location.hash || '#cultura');
+        });
+    </script>
+</body>
+</html>
